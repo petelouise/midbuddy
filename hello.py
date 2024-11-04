@@ -1,8 +1,6 @@
 import os
 from sys import argv
-from PIL import Image
-import piexif
-import piexif.helper
+import pyexiv2
 
 
 class Job:
@@ -28,17 +26,13 @@ def parse_file_path(file_path) -> tuple[str, int]:
 
 
 def add_url_metadata(file_path: str) -> None:
-    """Add the job URL as metadata to the image file using IPTC:Source."""
+    """Add the job URL as metadata to the image file using IPTC Source."""
     job = Job.from_file_path(file_path)
     url = job.url
 
-    with Image.open(file_path) as img:
-        # Create a new info dictionary with existing metadata
-        info = img.info
-        info['Source'] = url
-        
-        # Save with metadata preserved
-        img.save(file_path, format=img.format, **info)
+    with pyexiv2.Image(file_path) as img:
+        # Set IPTC Source metadata
+        img.modify_iptc({'Iptc.Application2.Source': url})
 
 
 def main():

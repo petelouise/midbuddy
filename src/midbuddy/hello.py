@@ -38,12 +38,8 @@ def add_url_metadata(file_path: str) -> None:
         img.modify_xmp({"Xmp.xmp.Identifier": url})
 
 
-def main():
-    file_path = argv[1]
+def process_file(file_path: str) -> str:
+    """Process a file by adding metadata and returning the job URL."""
     job = Job.from_file_path(file_path)
-    print(job.url)
     add_url_metadata(file_path)
-
-
-if __name__ == "__main__":
-    main()
+    return job.url

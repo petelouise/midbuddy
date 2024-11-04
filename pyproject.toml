@@ -3,6 +3,7 @@ name = "midbuddy"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
+authors = [{ name = "petelouise", email = "programmetress@petelouise.beauty" }]
 requires-python = ">=3.12"
 dependencies = [
     "click>=8.1.7",
@@ -10,3 +11,10 @@ dependencies = [
     "pillow>=11.0.0",
     "pyexiv2>=2.15.3",
 ]
+
+[project.scripts]
+midbuddy = "midbuddy:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

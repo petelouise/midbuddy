@@ -1,5 +1,6 @@
 import os
 from sys import argv
+
 import pyexiv2
 
 
@@ -32,7 +33,7 @@ def add_url_metadata(file_path: str) -> None:
 
     with pyexiv2.Image(file_path) as img:
         # Set IPTC Source metadata
-        img.modify_iptc({'Iptc.Application2.Source': url})
+        img.modify_iptc({"Iptc.Application2.Source": url})
 
 
 def main():

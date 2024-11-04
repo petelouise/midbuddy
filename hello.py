@@ -1,6 +1,6 @@
 import os
 from sys import argv
-
+from PIL import Image
 import piexif
 import piexif.helper
 
@@ -28,16 +28,17 @@ def parse_file_path(file_path) -> tuple[str, int]:
 
 
 def add_url_metadata(file_path: str) -> None:
-    """Add the job URL as metadata to the image file using IPTC:Source and XMP:url."""
+    """Add the job URL as metadata to the image file using IPTC:Source."""
     job = Job.from_file_path(file_path)
     url = job.url
 
-    # Add IPTC Source
-    exif_dict = piexif.load(file_path)
-    if "Iptc" not in exif_dict:
-        exif_dict["Iptc"] = {}
-    exif_dict["Iptc"][(2, 115)] = url.encode("utf-8")  # 2:115 is Source
-    piexif.insert(piexif.dump(exif_dict), file_path)
+    with Image.open(file_path) as img:
+        # Create a new info dictionary with existing metadata
+        info = img.info
+        info['Source'] = url
+        
+        # Save with metadata preserved
+        img.save(file_path, format=img.format, **info)
 
 
 def main():

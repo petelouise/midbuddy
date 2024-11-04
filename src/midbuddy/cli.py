@@ -5,22 +5,22 @@ from .hello import process_file
 
 @click.group()
 def cli():
-    """MidBuddy - Midjourney helper tools."""
+    """midbuddy - helps with midjourney."""
     pass
 
 
 @cli.group()
 def meta():
-    """Metadata management commands."""
+    """metadata management commands."""
     pass
 
 
 @meta.command()
 @click.argument("path", type=click.Path(exists=True))
 def add(path):
-    """Add Midjourney metadata to an image file."""
+    """add midjourney metadata to an image file."""
     url = process_file(path)
-    click.echo(f"Added metadata URL: {url}")
+    click.echo(f"added metadata url: {url}")
 
 
 if __name__ == "__main__":

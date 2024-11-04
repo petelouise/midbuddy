@@ -27,13 +27,15 @@ def parse_file_path(file_path) -> tuple[str, int]:
 
 
 def add_url_metadata(file_path: str) -> None:
-    """Add the job URL as metadata to the image file using IPTC Source."""
+    """Add the job URL as metadata to the image file using IPTC Source and XMP URL."""
     job = Job.from_file_path(file_path)
     url = job.url
 
     with pyexiv2.Image(file_path) as img:
         # Set IPTC Source metadata
         img.modify_iptc({"Iptc.Application2.Source": url})
+        # Set XMP URL metadata
+        img.modify_xmp({"Xmp.xmp.Identifier": url})
 
 
 def main():

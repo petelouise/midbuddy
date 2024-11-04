@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
-midbuddy = "midbuddy:cli"
+midbuddy = "midbuddy.cli:cli"
 
 [build-system]
 requires = ["hatchling"]

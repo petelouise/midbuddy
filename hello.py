@@ -1,10 +1,8 @@
 import os
-import re
 from sys import argv
-from PIL import Image
+
 import piexif
 import piexif.helper
-from libxmp import XMPFiles, consts
 
 
 class Job:
@@ -38,18 +36,9 @@ def add_url_metadata(file_path: str) -> None:
     exif_dict = piexif.load(file_path)
     if "Iptc" not in exif_dict:
         exif_dict["Iptc"] = {}
-    exif_dict["Iptc"][(2, 115)] = url.encode('utf-8')  # 2:115 is Source
+    exif_dict["Iptc"][(2, 115)] = url.encode("utf-8")  # 2:115 is Source
     piexif.insert(piexif.dump(exif_dict), file_path)
 
-    # Add XMP url
-    xmpfile = XMPFiles(file_path=file_path, open_forupdate=True)
-    xmp = xmpfile.get_xmp()
-    if xmp is None:
-        xmp = libxmp.XMPMeta()
-    xmp.set_property(consts.XMP_NS_XMP, 'url', url)
-    if xmpfile.can_put_xmp(xmp):
-        xmpfile.put_xmp(xmp)
-    xmpfile.close_file()
 
 def main():
     file_path = argv[1]

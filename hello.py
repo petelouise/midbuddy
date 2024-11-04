@@ -1,6 +1,10 @@
 import os
 import re
 from sys import argv
+from PIL import Image
+import piexif
+import piexif.helper
+from libxmp import XMPFiles, consts
 
 
 class Job:
@@ -25,9 +29,33 @@ def parse_file_path(file_path) -> tuple[str, int]:
     return job_id, index
 
 
+def add_url_metadata(file_path: str) -> None:
+    """Add the job URL as metadata to the image file using IPTC:Source and XMP:url."""
+    job = Job.from_file_path(file_path)
+    url = job.url
+
+    # Add IPTC Source
+    exif_dict = piexif.load(file_path)
+    if "Iptc" not in exif_dict:
+        exif_dict["Iptc"] = {}
+    exif_dict["Iptc"][(2, 115)] = url.encode('utf-8')  # 2:115 is Source
+    piexif.insert(piexif.dump(exif_dict), file_path)
+
+    # Add XMP url
+    xmpfile = XMPFiles(file_path=file_path, open_forupdate=True)
+    xmp = xmpfile.get_xmp()
+    if xmp is None:
+        xmp = libxmp.XMPMeta()
+    xmp.set_property(consts.XMP_NS_XMP, 'url', url)
+    if xmpfile.can_put_xmp(xmp):
+        xmpfile.put_xmp(xmp)
+    xmpfile.close_file()
+
 def main():
-    job = Job.from_file_path(argv[1])
+    file_path = argv[1]
+    job = Job.from_file_path(file_path)
     print(job.url)
+    add_url_metadata(file_path)
 
 
 if __name__ == "__main__":

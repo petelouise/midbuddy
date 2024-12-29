@@ -1,7 +1,7 @@
 import webbrowser
+import exiftool
 
 import click
-from PIL import Image
 
 from .hello import process_file
 
@@ -33,22 +33,15 @@ def open(path) -> None:
     opens the midjourney job in a web browser.
     """
     try:
-        img = Image.open(path)
-        metadata = img.getexif()
-
-        if not metadata:
-            raise ValueError("No metadata found in the image.")
-
-        description = metadata.get(270)
+        with exiftool.ExifToolHelper() as et:
+            metadata = et.get_metadata(path)[0]
+            
+        description = metadata.get('XMP:Description')
+        if not description:
+            description = metadata.get('EXIF:ImageDescription')
+        
         if not description:
             raise ValueError("No description metadata found in the image.")
-
-        # ensure it's a string (pillow might return bytes or none)
-        description = (
-            description.decode("utf-8")
-            if isinstance(description, bytes)
-            else str(description)
-        )
 
         job_id_prefix = "Job ID: "
         if job_id_prefix not in description:

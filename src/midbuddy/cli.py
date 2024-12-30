@@ -1,3 +1,4 @@
+import re
 import webbrowser
 
 import click
@@ -56,7 +57,15 @@ def open(path) -> None:
         if not job_id:
             raise ValueError("The 'Job ID' field is empty or invalid.")
 
+        index_pattern = r"_([0-3])(?=\.[^\.]+$)"
+        match = re.search(index_pattern, path)
+        index = match[1] if match else None
+
         url = f"https://www.midjourney.com/jobs/{job_id}"
+
+        if index:
+            url += f"?index={index}"
+
         click.echo(f"Opening URL: {url}")
         webbrowser.open(url)
     except Exception as e:

@@ -1,7 +1,7 @@
 import webbrowser
-import exiftool
 
 import click
+import exiftool
 
 from .hello import process_file
 
@@ -35,17 +35,22 @@ def open(path) -> None:
     try:
         with exiftool.ExifToolHelper() as et:
             metadata = et.get_metadata(path)[0]
-            
-        description = metadata.get('XMP:Description')
-        if not description:
-            description = metadata.get('EXIF:ImageDescription')
-        
+            click.echo(f"Full metadata:\n{metadata}")
+
+        description = (
+            metadata.get("PNG:Description")
+            or metadata.get("XMP:Description")
+            or metadata.get("EXIF:ImageDescription")
+        )
+        click.echo(f"XMP:Description: {metadata.get('XMP:Description')}")
+        click.echo(f"EXIF:ImageDescription: {metadata.get('EXIF:ImageDescription')}")
+
         if not description:
             raise ValueError("No description metadata found in the image.")
 
         job_id_prefix = "Job ID: "
         if job_id_prefix not in description:
-            raise ValueError("No 'Job ID' field found in the description metadata.")
+            raise ValueError(f"No 'Job ID' field found in description: {description}")
 
         job_id = description.split(job_id_prefix)[-1].strip()
         if not job_id:
@@ -54,9 +59,8 @@ def open(path) -> None:
         url = f"https://www.midjourney.com/jobs/{job_id}"
         click.echo(f"Opening URL: {url}")
         webbrowser.open(url)
-
     except Exception as e:
-        click.echo(f"Error: {e}", err=True)
+        click.echo(f"Unexpected Error: {e}", err=True)
 
 
 if __name__ == "__main__":

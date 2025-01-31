@@ -9,6 +9,7 @@ dependencies = [
     "click>=8.1.7",
     "pyexiftool>=0.5.6",
     "pyexiv2>=2.15.3",
+    "send2trash>=1.8.3",
 ]
 
 [project.scripts]

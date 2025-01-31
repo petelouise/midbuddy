@@ -1,10 +1,10 @@
 import os
 import re
+import shutil
 import webbrowser
 import zipfile
-import shutil
-from pathlib import Path
 from glob import glob
+from pathlib import Path
 
 import click
 import exiftool
@@ -88,47 +88,48 @@ def get_url(path: str) -> str:
 if __name__ == "__main__":
     cli()
 
+
 @cli.command()
-@click.argument('output_dir', type=str)
-@click.argument('input_paths', nargs=-1, type=click.Path(exists=True))
+@click.argument("output_dir", type=str)
+@click.argument("input_paths", nargs=-1, type=click.Path(exists=True))
 def collect(output_dir: str, input_paths) -> None:
     """
-    Collect files from input paths into a new directory.
-    Handles zip files and nested directories.
+    collect files from input paths into a new directory.
+    handles zip files and nested directories.
     """
-    # Create output directory
+    # create output directory
     output_path = Path(output_dir)
     if output_path.exists():
-        raise click.ClickException(f"Output directory {output_dir} already exists")
+        raise click.ClickException(f"output directory {output_dir} already exists")
     output_path.mkdir(parents=True)
-    
-    temp_dir = output_path / "_temp"
-    
+
+    temp_dir = output_path / "_tmp"
+
     for input_path in input_paths:
         path = Path(input_path)
-        
-        # Handle zip files
-        if path.suffix.lower() == '.zip':
+
+        # handle zip files
+        if path.suffix.lower() == ".zip":
             temp_dir.mkdir(exist_ok=True)
-            with zipfile.ZipFile(path, 'r') as zip_ref:
+            with zipfile.ZipFile(path, "r") as zip_ref:
                 zip_ref.extractall(temp_dir)
-            
-            # Move files from temp directory
-            for file in temp_dir.rglob('*'):
+
+            # move files from temp directory
+            for file in temp_dir.rglob("*"):
                 if file.is_file():
                     shutil.move(str(file), str(output_path / file.name))
-            
-            # Clean up temp directory
+
+            # clean up temp directory
             shutil.rmtree(temp_dir)
-            
-        # Handle directories
+
+        # handle directories
         elif path.is_dir():
-            for file in path.rglob('*'):
+            for file in path.rglob("*"):
                 if file.is_file():
                     shutil.copy2(str(file), str(output_path / file.name))
-                    
-        # Handle individual files
+
+        # handle individual files
         else:
             shutil.copy2(str(path), str(output_path / path.name))
-    
+
     click.echo(f"Collected files into {output_dir}")

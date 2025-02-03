@@ -164,21 +164,20 @@ def move(dir_name: str, input_paths, recursive: bool) -> None:
         target_dir.mkdir(parents=True)
         click.echo(f"created new directory: {target_dir}")
 
-    # Move all input files
+    # move all input files
     for input_path in input_paths:
         path = Path(input_path)
         if path.is_file():
             shutil.move(str(path), str(target_dir / path.name))
         elif path.is_dir():
             if recursive:
-                # Move individual files from directory
+                # move individual files from directory
                 for file in path.rglob("*"):
                     if file.is_file():
                         shutil.move(str(file), str(target_dir / file.name))
-                # Remove the now-empty directory
                 shutil.rmtree(path)
             else:
-                # Move entire directory
+                # move entire directory
                 shutil.move(str(path), str(target_dir / path.name))
 
     click.echo(f"moved files to {target_dir}")

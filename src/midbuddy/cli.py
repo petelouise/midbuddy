@@ -137,3 +137,42 @@ def collect(output_dir: str, input_paths, trash: bool) -> None:
                 send2trash(str(path))
 
     click.echo(f"Collected files into {output_dir}")
+
+
+@cli.command()
+@click.argument("dir_name", type=str)
+@click.argument("input_paths", nargs=-1, type=click.Path(exists=True))
+def move(dir_name: str, input_paths) -> None:
+    """
+    Move files to ~/Dropbox/pictures/{dir_name}.
+    Creates directory if it doesn't exist.
+    """
+    # Validate directory name
+    if not re.match(r'^[a-zA-Z0-9_-]+$', dir_name):
+        raise click.ClickException(
+            "Directory name must contain only letters, numbers, underscores and hyphens"
+        )
+    
+    # Construct target directory path
+    target_dir = Path.home() / "Dropbox" / "pictures" / dir_name
+    
+    # Check if directory exists
+    if target_dir.exists():
+        click.echo(f"Using existing directory: {target_dir}")
+    else:
+        target_dir.mkdir(parents=True)
+        click.echo(f"Created new directory: {target_dir}")
+    
+    # Move all input files
+    for input_path in input_paths:
+        path = Path(input_path)
+        if path.is_file():
+            shutil.move(str(path), str(target_dir / path.name))
+        elif path.is_dir():
+            for file in path.rglob("*"):
+                if file.is_file():
+                    shutil.move(str(file), str(target_dir / file.name))
+            # Remove the now-empty directory
+            path.rmdir()
+    
+    click.echo(f"Moved files to {target_dir}")

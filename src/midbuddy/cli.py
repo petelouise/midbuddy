@@ -20,17 +20,9 @@ def cli() -> None:
     pass
 
 
-@cli.group()
-def meta() -> None:
-    """
-    metadata management commands.
-    """
-    pass
-
-
-@meta.command()
+@cli.command()
 @click.argument("path", type=click.Path(exists=True))
-def add(path) -> None:
+def add_metadata(path) -> None:
     """
     add midjourney metadata to an image file.
     """
@@ -93,7 +85,9 @@ if __name__ == "__main__":
 @cli.command()
 @click.argument("output_dir", type=str)
 @click.argument("input_paths", nargs=-1, type=click.Path(exists=True))
-@click.option("--trash", is_flag=True, help="Move input files to trash after collecting")
+@click.option(
+    "--trash", is_flag=True, help="move input files to trash after collecting"
+)
 def collect(output_dir: str, input_paths, trash: bool) -> None:
     """
     collect files from input paths into a new directory.
@@ -123,7 +117,7 @@ def collect(output_dir: str, input_paths, trash: bool) -> None:
 
             # clean up temp directory
             shutil.rmtree(temp_dir)
-            
+
             if trash:
                 send2trash(str(path))
 
@@ -132,7 +126,7 @@ def collect(output_dir: str, input_paths, trash: bool) -> None:
             for file in path.rglob("*"):
                 if file.is_file():
                     shutil.copy2(str(file), str(output_path / file.name))
-            
+
             if trash:
                 send2trash(str(path))
 

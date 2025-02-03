@@ -142,6 +142,7 @@ def collect(output_dir: str, input_paths, trash: bool) -> None:
 @cli.command()
 @click.argument("dir_name", type=str)
 @click.argument("input_paths", nargs=-1, type=click.Path(exists=True))
+@click.option("-r", "--recursive", is_flag=True, help="recursively move files")
 def move(dir_name: str, input_paths) -> None:
     """
     move files to ~/dropbox/pictures/{dir_name}.

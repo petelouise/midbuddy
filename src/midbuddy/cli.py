@@ -143,7 +143,7 @@ def collect(output_dir: str, input_paths, trash: bool) -> None:
 @click.argument("dir_name", type=str)
 @click.argument("input_paths", nargs=-1, type=click.Path(exists=True))
 @click.option("-r", "--recursive", is_flag=True, help="recursively move files")
-def move(dir_name: str, input_paths) -> None:
+def move(dir_name: str, input_paths, recursive: bool) -> None:
     """
     move files to ~/dropbox/pictures/{dir_name}.
     creates directory if it doesn't exist.
@@ -170,10 +170,15 @@ def move(dir_name: str, input_paths) -> None:
         if path.is_file():
             shutil.move(str(path), str(target_dir / path.name))
         elif path.is_dir():
-            for file in path.rglob("*"):
-                if file.is_file():
-                    shutil.move(str(file), str(target_dir / file.name))
-            # Remove the now-empty directory
-            path.rmdir()
+            if recursive:
+                # Move individual files from directory
+                for file in path.rglob("*"):
+                    if file.is_file():
+                        shutil.move(str(file), str(target_dir / file.name))
+                # Remove the now-empty directory
+                shutil.rmtree(path)
+            else:
+                # Move entire directory
+                shutil.move(str(path), str(target_dir / path.name))
 
     click.echo(f"moved files to {target_dir}")
